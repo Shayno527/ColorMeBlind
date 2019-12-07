@@ -68,6 +68,16 @@ namespace GoogleARCore.Examples.HelloAR
         /// </summary>
         private bool m_IsQuitting = false;
 
+        // Grab the camera's view when this variable is true.
+        bool grab;
+
+        // The "m_Display" is the GameObject whose Texture will be set to the captured image.
+        public Renderer m_Display;
+
+        public Texture2D heightmap;
+        public Vector3 size = new Vector3(100, 10, 100);
+
+
         /// <summary>
         /// The Unity Awake() method.
         /// </summary>
@@ -151,6 +161,12 @@ namespace GoogleARCore.Examples.HelloAR
 
                     // Make game object a child of the anchor.
                     gameObject.transform.parent = anchor.transform;
+
+                    int x = Mathf.FloorToInt(transform.position.x / size.x * heightmap.width);
+                    int z = Mathf.FloorToInt(transform.position.z / size.z * heightmap.height);
+                    Vector3 pos = transform.position;
+                    pos.y = heightmap.GetPixel(x, z).grayscale * size.y;
+                    transform.position = pos;
                 }
             }
         }
@@ -195,6 +211,24 @@ namespace GoogleARCore.Examples.HelloAR
                     "ARCore encountered a problem connecting.  Please start the app again.");
                 m_IsQuitting = true;
                 Invoke("_DoQuit", 0.5f);
+            }
+        }
+
+        private void OnPostRender()
+        {
+            if (grab)
+            {
+                //Create a new texture with the width and height of the screen
+                Texture2D texture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
+                //Read the pixels in the Rect starting at 0,0 and ending at the screen's width and height
+                texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0, false);
+                texture.Apply();
+                //Check that the display field has been assigned in the Inspector
+                if (m_Display != null)
+                    //Give your GameObject with the renderer this texture
+                    m_Display.material.mainTexture = texture;
+                //Reset the grab state
+                grab = false;
             }
         }
 

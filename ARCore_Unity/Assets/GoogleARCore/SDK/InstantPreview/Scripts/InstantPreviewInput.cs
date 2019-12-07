@@ -154,6 +154,11 @@ namespace GoogleARCore
             return Input.GetMouseButtonUp(button);
         }
 
+        internal static bool GetKeyDown(KeyCode space)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Refreshes touch inputs from Instant Preview to reflect the state
         /// since the last time Update was called.
